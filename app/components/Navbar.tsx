@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface DropdownItem {
     label: string;
@@ -59,7 +60,49 @@ function NavLink({ label, href, dropdown }: NavLinkProps) {
     );
 }
 
+interface Service {
+    id: number;
+    slug: string;
+    title: string;
+}
+
+interface Role {
+    id: number;
+    name: string;
+}
+
 export default function Navbar() {
+    const [serviceItems, setServiceItems] = useState<DropdownItem[]>([]);
+    const [teamItems, setTeamItems] = useState<DropdownItem[]>([]);
+
+    useEffect(() => {
+        // Fetch services for dropdown
+        fetch('/api/services')
+            .then(r => r.json())
+            .then((data: Service[]) => {
+                if (Array.isArray(data)) {
+                    setServiceItems(data.map(s => ({
+                        label: s.title,
+                        href: `/services/${s.slug}`,
+                    })));
+                }
+            })
+            .catch(() => { });
+
+        // Fetch roles for team dropdown
+        fetch('/api/roles')
+            .then(r => r.json())
+            .then((data: Role[]) => {
+                if (Array.isArray(data)) {
+                    setTeamItems(data.map(r => ({
+                        label: r.name,
+                        href: `/team#${r.name.toLowerCase().replace(/\s+/g, '-')}`,
+                    })));
+                }
+            })
+            .catch(() => { });
+    }, []);
+
     return (
         <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] w-full max-w-3xl px-4 pointer-events-none">
             <div className="w-full bg-white/80 backdrop-blur-md border border-black/5 rounded-full h-11 shadow-2xl pointer-events-auto flex items-center justify-between px-5 relative transition-all duration-300">
@@ -67,8 +110,8 @@ export default function Navbar() {
                 {/* Left: Logo */}
                 <div className="flex items-center">
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
-                            <span className="text-[8px] font-black">S</span>
+                        <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-black flex items-center justify-center group-hover:border-black/50 transition-all">
+                            <Image src="/logo.png" alt="SicilyLabs Logo" width={24} height={24} className="w-full h-full object-cover" />
                         </div>
                         <span className="text-xs font-black tracking-tighter text-black uppercase hidden sm:block">SICILYLABS</span>
                     </Link>
@@ -84,23 +127,9 @@ export default function Navbar() {
                         { label: 'Featured Projects', href: '/#projects' },
                         { label: 'Get Started', href: '/contact' },
                     ]} />
-                    <NavLink label="Services" href="/services" dropdown={[
-                        { label: 'Brand Identity', href: '/services/brand-identity' },
-                        { label: 'UI/UX Design', href: '/services/ui-ux-design' },
-                        { label: 'Software Dev', href: '/services/software-dev' },
-                        { label: 'Motion Graphics', href: '/services/motion-graphics' },
-                        { label: 'Embedded Systems', href: '/services/embedded-systems' },
-                        { label: 'OS Development', href: '/services/os-development' },
-                        { label: 'Game Development', href: '/services/game-development' },
-                        { label: '3D Modeling', href: '/services/3d-modeling' },
-                    ]} />
+                    <NavLink label="Services" href="/services" dropdown={serviceItems.length > 0 ? serviceItems : undefined} />
                     <NavLink label="Blog" href="/blog" />
-                    <NavLink label="Our Team" href="/team" dropdown={[
-                        { label: 'Project Managers', href: '/team#project-managers' },
-                        { label: 'Designers', href: '/team#designers' },
-                        { label: 'Engineers', href: '/team#engineers' },
-                        { label: 'QA Leads', href: '/team#qa-leads' },
-                    ]} />
+                    <NavLink label="Our Team" href="/team" dropdown={teamItems.length > 0 ? teamItems : undefined} />
                     <NavLink label="Contact Us" href="/contact" />
                 </div>
             </div>
