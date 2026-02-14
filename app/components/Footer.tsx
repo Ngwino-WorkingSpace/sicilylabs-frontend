@@ -14,6 +14,13 @@ const HillPath = ({ d, fill, delay }: { d: string, fill: string, delay: number }
     />
 );
 
+const socialLinks = [
+    { label: 'Instagram', href: 'https://www.instagram.com/sicilylabs/' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/sicily-labs' },
+    { label: 'Email', href: 'mailto:info@sicilylabs.rw' },
+    { label: 'TikTok', href: 'https://www.tiktok.com/@sicilylabs' },
+];
+
 export default function Footer() {
     return (
         <footer className="w-full relative overflow-hidden bg-white mt-12 pb-12">
@@ -71,8 +78,8 @@ export default function Footer() {
 
                     <div className="flex flex-col gap-2">
                         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-300 mb-2">Connect</span>
-                        {['Instagram', 'LinkedIn', 'Twitter'].map(item => (
-                            <a key={item} href="#" className="text-[11px] font-bold uppercase text-zinc-600 hover:text-black transition-colors">{item}</a>
+                        {socialLinks.map(item => (
+                            <a key={item.label} href={item.href} target={item.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener noreferrer" className="text-[11px] font-bold uppercase text-zinc-600 hover:text-black transition-colors">{item.label}</a>
                         ))}
                     </div>
 
