@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 
@@ -114,8 +115,8 @@ export default function BlogPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                        <span className="text-white text-[9px] font-black">SL</span>
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-black flex items-center justify-center">
+                        <Image src="/logo.png" alt="SicilyLabs" width={32} height={32} className="w-full h-full object-cover" />
                     </div>
                     <span className="text-[11px] font-bold text-zinc-700 hidden sm:block">SicilyLabs</span>
                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-200" />
@@ -178,8 +179,8 @@ export default function BlogPage() {
                         >
                             {/* Author row */}
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center shrink-0">
-                                    <span className="text-white text-[9px] font-black">SL</span>
+                                <div className="w-9 h-9 rounded-full overflow-hidden bg-black flex items-center justify-center shrink-0">
+                                    <Image src="/logo.png" alt="SicilyLabs" width={36} height={36} className="w-full h-full object-cover" />
                                 </div>
                                 <div>
                                     <p className="text-[11px] font-black text-black">SicilyLabs</p>
@@ -242,8 +243,8 @@ export default function BlogPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
                             className={`snap-start shrink-0 w-[200px] text-left rounded-2xl p-5 border transition-all duration-300 ${active === i
-                                    ? 'bg-black text-white border-black shadow-xl scale-[1.02]'
-                                    : 'bg-white text-black border-zinc-100 hover:border-zinc-300 hover:shadow-sm'
+                                ? 'bg-black text-white border-black shadow-xl scale-[1.02]'
+                                : 'bg-white text-black border-zinc-100 hover:border-zinc-300 hover:shadow-sm'
                                 }`}
                         >
                             <span className={`text-[8px] font-black uppercase tracking-[0.2em] mb-3 block ${active === i ? 'text-zinc-400' : 'text-zinc-300'}`}>
