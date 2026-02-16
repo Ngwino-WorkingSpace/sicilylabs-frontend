@@ -77,3 +77,7 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
     return proxyRequest(req);
 }
+
+export async function PATCH(req: NextRequest) {
+    return proxyRequest(req);
+}
