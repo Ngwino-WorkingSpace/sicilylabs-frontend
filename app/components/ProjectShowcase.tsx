@@ -18,15 +18,13 @@ function ProjectIcon({ label, icon }: ProjectIconProps) {
     );
 }
 
-const projects = [
-    {
-        id: '01',
-        title: 'STOCKA',
-        accent: 'INV.',
-        subtitle: 'Inventory & Ledger',
-        tag: 'About project',
-        description: 'STOCKA is a professional-grade dashboard designed for modern vendors to monitor stock levels in real-time and record debtors.',
-        mirrored: false,
+// --- LOCAL UI ASSETS --- //
+// In our backend, we only store the metadata (title, subtitle, description, tag)
+// The rich, animated 3D mockups and SVG icons are strictly frontend UI concerns.
+// We map them by the project ID.
+
+const UI_ASSETS: Record<string, { icons: { label: string, svg: React.ReactNode }[], mockup: React.ReactNode }> = {
+    '01': {
         icons: [
             { label: 'Inventory', svg: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg> },
             { label: 'Ledger', svg: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z" /></svg> },
@@ -61,14 +59,7 @@ const projects = [
             </div>
         )
     },
-    {
-        id: '02',
-        title: 'NGWINO',
-        accent: 'APP.',
-        subtitle: 'Community Super-App',
-        tag: 'Community impact',
-        description: 'Ngwino is a community super-app handling real-time map interactions, event bookings, and secure digital payments.',
-        mirrored: false,
+    '02': {
         icons: [
             { label: 'Map Engine', svg: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z" /><path d="M9 4v13" /><path d="M15 7v13" /></svg> },
             { label: 'Digital Pay', svg: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg> },
@@ -97,14 +88,7 @@ const projects = [
             </div>
         )
     },
-    {
-        id: '03',
-        title: 'LAVENDER',
-        accent: 'FASH.',
-        subtitle: 'Retail E-commerce',
-        tag: 'Fashion Tech',
-        description: 'Lavender is a premium fashion e-commerce platform designed for visual storytelling and seamless retail operations.',
-        mirrored: true,
+    '03': {
         icons: [
             { label: 'Visual Story', svg: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" /></svg> },
             { label: 'Order Flow', svg: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></svg> },
@@ -142,18 +126,42 @@ const projects = [
             </div>
         )
     }
-];
+}
+
+interface ProjectData {
+    id: string;
+    title: string;
+    accent: string;
+    subtitle: string;
+    tag: string;
+    description: string;
+    mirrored: boolean;
+    icons: string[];
+}
 
 export default function ProjectShowcase() {
     const [currentIdx, setCurrentIdx] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [projects, setProjects] = useState<ProjectData[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        fetch('/api/projects')
+            .then(res => res.json())
+            .then(data => {
+                setProjects(Array.isArray(data) ? data : []);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    useEffect(() => {
+        if (projects.length === 0) return;
         const timer = setInterval(() => {
             handleNext();
         }, 6000);
         return () => clearInterval(timer);
-    }, [currentIdx]);
+    }, [currentIdx, projects.length]);
 
     const handleNext = () => {
         setIsAnimating(true);
@@ -163,7 +171,28 @@ export default function ProjectShowcase() {
         }, 500);
     };
 
+    if (loading) {
+        return (
+            <div className="relative min-h-[500px] flex items-center justify-center py-12 md:py-20 text-zinc-400 font-medium">
+                Loading projects...
+            </div>
+        );
+    }
+
+    if (projects.length === 0) {
+        return (
+            <div className="relative min-h-[500px] flex items-center justify-center py-12 md:py-20 text-zinc-400 font-medium">
+                No featured projects right now.
+            </div>
+        );
+    }
+
     const project = projects[currentIdx];
+    // Fallback UI if id not in our local dict
+    const ui = UI_ASSETS[project.id] || {
+        icons: [],
+        mockup: <div className="w-44 h-[360px] bg-zinc-100 flex items-center justify-center text-xs text-black/50">Missing Mockup</div>
+    };
 
     return (
         <div className="bg-white overflow-hidden">
@@ -183,7 +212,7 @@ export default function ProjectShowcase() {
 
                     {/* Mockup Container */}
                     <div className={`relative w-full md:w-1/2 flex justify-center perspective-1000 scale-90 md:scale-95 group transition-all duration-1000 delay-100 ${isAnimating ? (project.mirrored ? '-rotate-y-12' : 'rotate-y-12') : 'rotate-y-0'}`}>
-                        {project.mockup}
+                        {ui.mockup}
 
                         {/* Background Polish */}
                         <div className={`absolute -top-10 w-24 h-24 bg-zinc-50 border border-black/5 rounded-2xl -z-10 ${project.mirrored ? '-right-10 -rotate-12' : '-left-10 rotate-12'}`} />
@@ -207,7 +236,7 @@ export default function ProjectShowcase() {
 
                         {/* Technical Icons */}
                         <div className="flex gap-8 mb-10">
-                            {project.icons.map((icon, i) => (
+                            {ui.icons.map((icon, i) => (
                                 <ProjectIcon key={i} label={icon.label} icon={icon.svg} />
                             ))}
                         </div>
