@@ -6,84 +6,31 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 
-const posts = [
-    {
-        id: 1,
-        slug: 'shipping-mvp-in-12-days',
-        category: 'Engineering',
-        date: 'Feb 18, 2026',
-        title: 'How We Shipped a Full-Stack MVP in 12 Days',
-        excerpt: '"12 Days" chronicles how a single deadline redefined our engineering process. No fluff, no excuses — just a tight sprint, smart trade-offs, and a product in the hands of real users.',
-        readTime: '8 min',
-    },
-    {
-        id: 2,
-        slug: 'design-system-in-5-days',
-        category: 'Design',
-        date: 'Feb 12, 2026',
-        title: 'A Complete Design System in 5 Days: Our Process',
-        excerpt: 'How do you build a scalable, production-ready component system in five days? You start with tokens, not components. This is that story.',
-        readTime: '6 min',
-    },
-    {
-        id: 3,
-        slug: 'embedded-firmware-hard-truths',
-        category: 'Embedded',
-        date: 'Feb 5, 2026',
-        title: 'Hard Truths About Embedded Firmware Development',
-        excerpt: 'Hardware never lies. When your firmware breaks in the field there\'s no hotfix. We share the lessons learned the hard and expensive way.',
-        readTime: '10 min',
-    },
-    {
-        id: 4,
-        slug: 'motion-graphics-one-day',
-        category: 'Motion',
-        date: 'Jan 29, 2026',
-        title: 'Yes, a Motion Graphic in One Day Is Possible',
-        excerpt: 'Speed doesn\'t mean cutting corners. It means knowing exactly where to start. Our full motion pipeline — from storyboard to final export in 24 hours.',
-        readTime: '5 min',
-    },
-    {
-        id: 5,
-        slug: 'game-prototype-10-days',
-        category: 'Games',
-        date: 'Jan 22, 2026',
-        title: 'From Game Concept to Playable Prototype in 10 Days',
-        excerpt: 'Scope kills game projects. We use a tightly scoped GDD and rapid prototyping to validate mechanics before writing a single line of production code.',
-        readTime: '7 min',
-    },
-    {
-        id: 6,
-        slug: 'why-we-love-os-development',
-        category: 'Systems',
-        date: 'Jan 15, 2026',
-        title: 'Why We Love OS Development (And Why You Should Care)',
-        excerpt: 'Most studios avoid kernel-level work. We run toward it. What makes operating system engineering so compelling — and commercially underrated.',
-        readTime: '9 min',
-    },
-    {
-        id: 7,
-        slug: '3d-renders-48-hours',
-        category: '3D Design',
-        date: 'Jan 8, 2026',
-        title: 'Studio-Quality 3D Renders in 48 Hours: Our Pipeline',
-        excerpt: 'Clients always ask: how do you do it so fast? The answer is process. Our end-to-end 3D pipeline from concept to photorealistic output, documented.',
-        readTime: '6 min',
-    },
-    {
-        id: 8,
-        slug: 'the-lab-philosophy',
-        category: 'Culture',
-        date: 'Jan 2, 2026',
-        title: 'The Lab Never Sleeps: Our Philosophy on Speed & Quality',
-        excerpt: 'Speed and quality are not opposites. They\'re both symptoms of the same thing: clarity. This is the SicilyLabs founding philosophy, written in full.',
-        readTime: '11 min',
-    },
-];
+interface BlogPost {
+    id: number;
+    slug: string;
+    category: string;
+    date: string;
+    title: string;
+    excerpt: string;
+    readTime: string;
+}
 
 export default function BlogPage() {
     const [active, setActive] = useState(0);
+    const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [loading, setLoading] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        fetch('/api/blogs')
+            .then(res => res.json())
+            .then(data => {
+                setPosts(Array.isArray(data) ? data : []);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+    }, []);
 
     const featured = posts[active];
 
@@ -96,6 +43,24 @@ export default function BlogPage() {
         setActive(prev => Math.min(posts.length - 1, prev + 1));
         scrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' });
     };
+
+    if (loading) {
+        return (
+            <main className="min-h-screen bg-[#f9f9f9] font-sans flex flex-col items-center justify-center">
+                <Navbar />
+                <p className="text-zinc-400 font-medium">Loading stories...</p>
+            </main>
+        );
+    }
+
+    if (posts.length === 0 || !featured) {
+        return (
+            <main className="min-h-screen bg-[#f9f9f9] font-sans flex flex-col items-center justify-center">
+                <Navbar />
+                <p className="text-zinc-400 font-medium">No stories currently available.</p>
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-[#f9f9f9] font-sans flex flex-col">
