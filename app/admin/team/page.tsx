@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthProvider';
 import {
     modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
     sectionTitleStyle, fieldGroupStyle, fieldStyle, labelStyle, inputStyle,
-    textareaStyle, fileInputWrapperStyle, errorStyle, modalFooterStyle,
+    textareaStyle, fileInputWrapperStyle, modalFooterStyle,
     cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface TeamMember {
     id: string;
@@ -37,7 +38,6 @@ export default function TeamAdmin() {
     const [form, setForm] = useState(emptyForm);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
 
     const fetchTeam = async () => {
         try {
@@ -67,7 +67,6 @@ export default function TeamAdmin() {
         setEditing(null);
         setForm(emptyForm);
         setImageFile(null);
-        setError('');
         setShowForm(true);
     };
 
@@ -83,14 +82,12 @@ export default function TeamAdmin() {
             email: m.socialLinks?.email || '',
         });
         setImageFile(null);
-        setError('');
         setShowForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setError('');
         try {
             // Find role name from selected roleId
             const selectedRole = roles.find(r => r.id === form.roleId);
@@ -110,16 +107,34 @@ export default function TeamAdmin() {
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData,
             });
-            if (res.ok) { setShowForm(false); fetchTeam(); }
-            else { const d = await res.json(); setError(d.message || 'Failed'); }
-        } catch { setError('Network error'); }
+            if (res.ok) {
+                setShowForm(false);
+                fetchTeam();
+                toast.success(editing ? 'Member updated' : 'Member added');
+            }
+            else {
+                const d = await res.json();
+                toast.error(d.message || 'Failed to save');
+            }
+        } catch {
+            toast.error('Network error');
+        }
         setSaving(false);
     };
 
     const handleDelete = async (m: TeamMember) => {
         if (!confirm(`Remove "${m.name}"?`)) return;
-        await fetch(`/api/team/${m.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-        fetchTeam();
+        try {
+            const res = await fetch(`/api/team/${m.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.ok) {
+                toast.success('Member removed');
+                fetchTeam();
+            } else {
+                toast.error('Failed to remove member');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     const selectStyle: React.CSSProperties = {
@@ -154,7 +169,6 @@ export default function TeamAdmin() {
                             </div>
 
                             <div style={modalBodyStyle}>
-                                {error && <div style={errorStyle}>{error}</div>}
 
                                 <form onSubmit={handleSubmit}>
                                     {/* Section: Personal Info */}
