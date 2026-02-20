@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthProvider';
 import {
     modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
     sectionTitleStyle, fieldGroupStyle, fieldStyle, labelStyle, inputStyle,
-    textareaStyle, errorStyle, modalFooterStyle,
+    textareaStyle, modalFooterStyle,
     cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface ServiceStep {
     year: string;
@@ -39,7 +40,6 @@ export default function ServicesAdmin() {
     const [form, setForm] = useState(emptyForm);
     const [steps, setSteps] = useState<ServiceStep[]>([{ ...emptyStep }]);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
 
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
@@ -58,7 +58,6 @@ export default function ServicesAdmin() {
         setEditing(null);
         setForm(emptyForm);
         setSteps([{ ...emptyStep }]);
-        setError('');
         setShowForm(true);
     };
 
@@ -74,14 +73,12 @@ export default function ServicesAdmin() {
             icon: s.icon || '',
         });
         setSteps(s.steps && s.steps.length > 0 ? s.steps : [{ ...emptyStep }]);
-        setError('');
         setShowForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setError('');
         try {
             // Filter out empty steps
             const validSteps = steps.filter(s => s.title.trim());
@@ -90,16 +87,34 @@ export default function ServicesAdmin() {
             const url = editing ? `/api/services/${editing.id}` : '/api/services';
             const method = editing ? 'PUT' : 'POST';
             const res = await fetch(url, { method, headers, body: JSON.stringify(payload) });
-            if (res.ok) { setShowForm(false); fetchServices(); }
-            else { const d = await res.json(); setError(d.message || 'Failed to save'); }
-        } catch { setError('Network error'); }
+            if (res.ok) {
+                setShowForm(false);
+                fetchServices();
+                toast.success(editing ? 'Service updated' : 'Service created');
+            }
+            else {
+                const d = await res.json();
+                toast.error(d.message || 'Failed to save');
+            }
+        } catch {
+            toast.error('Network error');
+        }
         setSaving(false);
     };
 
     const handleDelete = async (s: Service) => {
         if (!confirm(`Delete "${s.title}"?`)) return;
-        await fetch(`/api/services/${s.id}`, { method: 'DELETE', headers });
-        fetchServices();
+        try {
+            const res = await fetch(`/api/services/${s.id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                toast.success('Service deleted');
+                fetchServices();
+            } else {
+                toast.error('Failed to delete service');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     const updateStep = (idx: number, field: keyof ServiceStep, value: string) => {
@@ -132,7 +147,6 @@ export default function ServicesAdmin() {
                             </div>
 
                             <div style={modalBodyStyle}>
-                                {error && <div style={errorStyle}>{error}</div>}
 
                                 <form onSubmit={handleSubmit}>
                                     {/* Section: Service Details */}
