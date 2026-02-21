@@ -2,10 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthProvider';
+import {
+    modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
+    sectionTitleStyle, fieldGroupStyle, fieldStyle, labelStyle, inputStyle,
+    textareaStyle, errorStyle, modalFooterStyle,
+    cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
+} from '../components/ModalStyles';
 
 interface Milestone {
     id: string;
-    _id?: string;
     label: string;
     number: string;
     year: string;
@@ -53,7 +58,7 @@ export default function MilestonesAdmin() {
         e.preventDefault(); setSaving(true); setError('');
         try {
             const payload = { ...form, cx: form.cx ? Number(form.cx) : undefined, cy: form.cy ? Number(form.cy) : undefined };
-            const url = editing ? `/api/milestones/${editing.id || editing._id}` : '/api/milestones';
+            const url = editing ? `/api/milestones/${editing.id}` : '/api/milestones';
             const res = await fetch(url, { method: editing ? 'PUT' : 'POST', headers, body: JSON.stringify(payload) });
             if (res.ok) { setShowForm(false); fetchData(); }
             else { const d = await res.json(); setError(d.message || 'Failed'); }
@@ -63,75 +68,121 @@ export default function MilestonesAdmin() {
 
     const handleDelete = async (m: Milestone) => {
         if (!confirm(`Delete "${m.title}"?`)) return;
-        await fetch(`/api/milestones/${m.id || m._id}`, { method: 'DELETE', headers });
+        await fetch(`/api/milestones/${m.id}`, { method: 'DELETE', headers });
         fetchData();
     };
 
-    const inp: React.CSSProperties = { width: '100%', padding: '10px 14px', fontSize: '13px', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '8px', outline: 'none', background: '#fafafa', boxSizing: 'border-box', marginTop: '4px' };
-    const lbl: React.CSSProperties = { fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)' };
-
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <div>
-                    <h1 style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '-0.03em', margin: 0 }}>Milestones</h1>
-                    <p style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', marginTop: '2px' }}>Manage your journey timeline</p>
-                </div>
-                <button onClick={openCreate} style={{ padding: '10px 20px', background: '#000', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>+ New Milestone</button>
-            </div>
-
-            {showForm && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-                    <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '540px', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '20px' }}>{editing ? 'Edit Milestone' : 'New Milestone'}</h2>
-                        {error && <div style={{ padding: '10px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', marginBottom: '16px', fontSize: '12px', color: '#991b1b' }}>{error}</div>}
-                        <form onSubmit={handleSubmit}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
-                                <div><label style={lbl}>Title *</label><input style={inp} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required /></div>
-                                <div><label style={lbl}>Label</label><input style={inp} value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} placeholder="The First Gig" /></div>
-                                <div><label style={lbl}>Number</label><input style={inp} value={form.number} onChange={e => setForm({ ...form, number: e.target.value })} placeholder="0 1." /></div>
-                                <div><label style={lbl}>Year</label><input style={inp} value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} placeholder="2019" /></div>
-                                <div><label style={lbl}>Company</label><input style={inp} value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} /></div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                                    <div><label style={lbl}>CX</label><input type="number" style={inp} value={form.cx} onChange={e => setForm({ ...form, cx: e.target.value })} /></div>
-                                    <div><label style={lbl}>CY</label><input type="number" style={inp} value={form.cy} onChange={e => setForm({ ...form, cy: e.target.value })} /></div>
-                                </div>
-                            </div>
-                            <div style={{ marginBottom: '20px' }}><label style={lbl}>Description *</label><textarea style={{ ...inp, minHeight: '80px' }} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required /></div>
-                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                                <button type="button" onClick={() => setShowForm(false)} style={{ padding: '10px 20px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
-                                <button type="submit" disabled={saving} style={{ padding: '10px 24px', background: '#000', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>{saving ? 'Saving...' : (editing ? 'Update' : 'Create')}</button>
-                            </div>
-                        </form>
+        <>
+            <style>{modalCSS}</style>
+            <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <div>
+                        <h1 style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '-0.03em', margin: 0 }}>Milestones</h1>
+                        <p style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', marginTop: '2px' }}>Manage your journey timeline</p>
                     </div>
+                    <button onClick={openCreate} style={{ padding: '10px 20px', background: '#000', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>+ New Milestone</button>
                 </div>
-            )}
 
-            <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead><tr style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                        {['#', 'Title', 'Year', 'Company', 'Actions'].map(h => <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)' }}>{h}</th>)}
-                    </tr></thead>
-                    <tbody>
-                        {loading ? <tr><td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: 'rgba(0,0,0,0.3)' }}>Loading...</td></tr>
-                            : milestones.length === 0 ? <tr><td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: 'rgba(0,0,0,0.3)' }}>No milestones yet.</td></tr>
-                                : milestones.map(m => (
-                                    <tr key={m.id || m._id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
-                                        <td style={{ padding: '12px 16px', fontSize: '12px', fontWeight: 800, color: 'rgba(0,0,0,0.3)' }}>{m.number || '—'}</td>
-                                        <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600 }}>{m.title}</td>
-                                        <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{m.year || '—'}</td>
-                                        <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{m.company || '—'}</td>
-                                        <td style={{ padding: '12px 16px' }}>
-                                            <div style={{ display: 'flex', gap: '6px' }}>
-                                                <button onClick={() => openEdit(m)} style={{ padding: '6px 12px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
-                                                <button onClick={() => handleDelete(m)} style={{ padding: '6px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                    </tbody>
-                </table>
+                {showForm && (
+                    <div style={modalOverlayStyle} onClick={() => setShowForm(false)}>
+                        <div className="modal-box" style={modalBoxStyle} onClick={e => e.stopPropagation()}>
+                            <div style={modalHeaderStyle}>
+                                <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#000', margin: 0, letterSpacing: '-0.02em' }}>
+                                    {editing ? 'Edit Milestone' : 'New Milestone'}
+                                </h2>
+                                <button style={closeBtnStyle} onClick={() => setShowForm(false)}>✕</button>
+                            </div>
+
+                            <div style={modalBodyStyle}>
+                                {error && <div style={errorStyle}>{error}</div>}
+
+                                <form onSubmit={handleSubmit}>
+                                    {/* Section: Milestone Info */}
+                                    <h3 style={sectionTitleStyle}>Milestone Details</h3>
+                                    <div style={fieldGroupStyle}>
+                                        <div style={fieldStyle}>
+                                            <label style={labelStyle}>Title *</label>
+                                            <input className="modal-input" style={inputStyle} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Product Launch" required />
+                                        </div>
+                                        <div style={fieldStyle}>
+                                            <label style={labelStyle}>Label</label>
+                                            <input className="modal-input" style={inputStyle} value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} placeholder="The First Gig" />
+                                        </div>
+                                        <div style={fieldStyle}>
+                                            <label style={labelStyle}>Number</label>
+                                            <input className="modal-input" style={inputStyle} value={form.number} onChange={e => setForm({ ...form, number: e.target.value })} placeholder="0 1." />
+                                        </div>
+                                        <div style={fieldStyle}>
+                                            <label style={labelStyle}>Year</label>
+                                            <input className="modal-input" style={inputStyle} value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} placeholder="2024" />
+                                        </div>
+                                        <div style={{ ...fieldStyle, gridColumn: '1 / -1' }}>
+                                            <label style={labelStyle}>Company</label>
+                                            <input className="modal-input" style={inputStyle} value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} placeholder="SicilyLabs" />
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Position */}
+                                    <h3 style={sectionTitleStyle}>Timeline Position</h3>
+                                    <div style={{ ...fieldGroupStyle, marginBottom: '20px' }}>
+                                        <div style={fieldStyle}>
+                                            <label style={labelStyle}>CX (X Position)</label>
+                                            <input className="modal-input" type="number" style={inputStyle} value={form.cx} onChange={e => setForm({ ...form, cx: e.target.value })} placeholder="0" />
+                                        </div>
+                                        <div style={fieldStyle}>
+                                            <label style={labelStyle}>CY (Y Position)</label>
+                                            <input className="modal-input" type="number" style={inputStyle} value={form.cy} onChange={e => setForm({ ...form, cy: e.target.value })} placeholder="0" />
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Description */}
+                                    <h3 style={sectionTitleStyle}>Description</h3>
+                                    <div style={{ ...fieldStyle, marginBottom: '8px' }}>
+                                        <label style={labelStyle}>Milestone Description *</label>
+                                        <textarea className="modal-input" style={textareaStyle} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Describe this milestone..." required />
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div style={modalFooterStyle}>
+                                        <button type="button" onClick={() => setShowForm(false)} style={cancelBtnStyle}>Cancel</button>
+                                        <button type="submit" disabled={saving} style={{ ...submitBtnStyle, opacity: saving ? 0.6 : 1 }}>
+                                            {saving ? 'Saving...' : (editing ? 'Update Milestone' : 'Create Milestone')}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Table */}
+                <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '14px', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead><tr style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                            {['#', 'Title', 'Year', 'Company', 'Actions'].map(h => <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)' }}>{h}</th>)}
+                        </tr></thead>
+                        <tbody>
+                            {loading ? <tr><td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: 'rgba(0,0,0,0.3)' }}>Loading...</td></tr>
+                                : milestones.length === 0 ? <tr><td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: 'rgba(0,0,0,0.3)' }}>No milestones yet.</td></tr>
+                                    : milestones.map(m => (
+                                        <tr key={m.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                                            <td style={{ padding: '12px 16px', fontSize: '12px', fontWeight: 800, color: 'rgba(0,0,0,0.3)' }}>{m.number || '—'}</td>
+                                            <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600 }}>{m.title}</td>
+                                            <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{m.year || '—'}</td>
+                                            <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{m.company || '—'}</td>
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <div style={{ display: 'flex', gap: '6px' }}>
+                                                    <button onClick={() => openEdit(m)} style={{ padding: '6px 14px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                                                    <button onClick={() => handleDelete(m)} style={{ padding: '6px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
