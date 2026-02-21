@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthProvider';
 import {
     modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
     sectionTitleStyle, fieldStyle, labelStyle, inputStyle,
-    errorStyle, modalFooterStyle,
+    modalFooterStyle,
     cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface Role {
     id: string;
@@ -22,7 +23,6 @@ export default function RolesAdmin() {
     const [editing, setEditing] = useState<Role | null>(null);
     const [name, setName] = useState('');
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
 
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
@@ -37,28 +37,45 @@ export default function RolesAdmin() {
 
     useEffect(() => { if (token) fetchRoles(); }, [token]);
 
-    const openCreate = () => { setEditing(null); setName(''); setError(''); setShowForm(true); };
+    const openCreate = () => { setEditing(null); setName(''); setShowForm(true); };
 
-    const openEdit = (r: Role) => { setEditing(r); setName(r.name); setError(''); setShowForm(true); };
+    const openEdit = (r: Role) => { setEditing(r); setName(r.name); setShowForm(true); };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setError('');
         try {
             const url = editing ? `/api/roles/${editing.id}` : '/api/roles';
             const method = editing ? 'PUT' : 'POST';
             const res = await fetch(url, { method, headers, body: JSON.stringify({ name }) });
-            if (res.ok) { setShowForm(false); fetchRoles(); }
-            else { const d = await res.json(); setError(d.message || 'Failed to save'); }
-        } catch { setError('Network error'); }
+            if (res.ok) {
+                setShowForm(false);
+                fetchRoles();
+                toast.success(editing ? 'Role updated' : 'Role created');
+            }
+            else {
+                const d = await res.json();
+                toast.error(d.message || 'Failed to save');
+            }
+        } catch {
+            toast.error('Network error');
+        }
         setSaving(false);
     };
 
     const handleDelete = async (r: Role) => {
         if (!confirm(`Delete role "${r.name}"?`)) return;
-        await fetch(`/api/roles/${r.id}`, { method: 'DELETE', headers });
-        fetchRoles();
+        try {
+            const res = await fetch(`/api/roles/${r.id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                toast.success('Role deleted');
+                fetchRoles();
+            } else {
+                toast.error('Failed to delete role');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     return (
@@ -83,7 +100,6 @@ export default function RolesAdmin() {
                                 <button style={closeBtnStyle} onClick={() => setShowForm(false)}>✕</button>
                             </div>
                             <div style={modalBodyStyle}>
-                                {error && <div style={errorStyle}>{error}</div>}
                                 <form onSubmit={handleSubmit}>
                                     <h3 style={sectionTitleStyle}>Role Details</h3>
                                     <div style={fieldStyle}>
