@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthProvider';
 import {
     modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
     sectionTitleStyle, fieldGroupStyle, fieldStyle, labelStyle, inputStyle,
-    textareaStyle, fileInputWrapperStyle, errorStyle, modalFooterStyle,
+    textareaStyle, fileInputWrapperStyle, modalFooterStyle,
     cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface Project {
     id: string;
@@ -35,7 +36,6 @@ export default function ProjectsAdmin() {
     const [form, setForm] = useState(emptyForm);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
 
     const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -54,7 +54,6 @@ export default function ProjectsAdmin() {
         setEditing(null);
         setForm(emptyForm);
         setImageFile(null);
-        setError('');
         setShowForm(true);
     };
 
@@ -73,14 +72,12 @@ export default function ProjectsAdmin() {
             link: p.link || '',
         });
         setImageFile(null);
-        setError('');
         setShowForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setError('');
         try {
             const formData = new FormData();
             formData.append('title', form.title);
@@ -99,16 +96,34 @@ export default function ProjectsAdmin() {
             const method = editing ? 'PUT' : 'POST';
 
             const res = await fetch(url, { method, headers: { 'Authorization': `Bearer ${token}` }, body: formData });
-            if (res.ok) { setShowForm(false); fetchProjects(); }
-            else { const d = await res.json(); setError(d.message || 'Failed to save'); }
-        } catch { setError('Network error'); }
+            if (res.ok) {
+                setShowForm(false);
+                fetchProjects();
+                toast.success(editing ? 'Project updated' : 'Project created');
+            }
+            else {
+                const d = await res.json();
+                toast.error(d.message || 'Failed to save');
+            }
+        } catch {
+            toast.error('Network error');
+        }
         setSaving(false);
     };
 
     const handleDelete = async (p: Project) => {
         if (!confirm(`Delete "${p.title}"?`)) return;
-        await fetch(`/api/projects/${p.id}`, { method: 'DELETE', headers });
-        fetchProjects();
+        try {
+            const res = await fetch(`/api/projects/${p.id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                toast.success('Project deleted');
+                fetchProjects();
+            } else {
+                toast.error('Failed to delete project');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     return (
@@ -134,7 +149,6 @@ export default function ProjectsAdmin() {
                             </div>
 
                             <div style={modalBodyStyle}>
-                                {error && <div style={errorStyle}>{error}</div>}
 
                                 <form onSubmit={handleSubmit}>
                                     {/* Section: Project Info */}
