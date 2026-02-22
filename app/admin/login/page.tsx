@@ -168,16 +168,13 @@ export default function LoginPage() {
                             <div style={{
                                 width: '52px',
                                 height: '52px',
-                                background: '#000',
                                 borderRadius: '14px',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                overflow: 'hidden',
                                 marginBottom: '24px',
-                                fontSize: '24px',
-                                color: '#fff',
-                                fontWeight: 900,
-                            }}>S</div>
+                                display: 'inline-block',
+                            }}>
+                                <img src="/logo.png" alt="SicilyLabs Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
                             <h1 style={{
                                 fontSize: '28px',
                                 fontWeight: 900,
@@ -273,7 +270,9 @@ export default function LoginPage() {
                         transition: 'opacity 1.5s ease 0.3s',
                     }}>
                         <SplineErrorBoundary fallback={
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.15)', fontSize: '48px', fontWeight: 900 }}>S</div>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <img src="/logo.png" alt="SicilyLabs Logo" style={{ width: '80px', height: '80px', objectFit: 'contain', opacity: 0.15 }} />
+                            </div>
                         }>
                             <Spline
                                 scene="https://prod.spline.design/oeKmWN4mwzDSMNxH/scene.splinecode"
