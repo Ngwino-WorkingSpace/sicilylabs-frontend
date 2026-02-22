@@ -1,7 +1,8 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import Spline from '@splinetool/react-spline';
+import dynamic from 'next/dynamic';
+const Spline = dynamic(() => import('@splinetool/react-spline'), { ssr: false });
 import Lottie from 'lottie-react';
 import contactAnimation from '../../public/Contact-us.json';
 
@@ -41,11 +42,25 @@ class SplineErrorBoundary extends Component<Props, State> {
 export default function SplineScene({ scene }: { scene: string }) {
     const [isSplineLoaded, setIsSplineLoaded] = React.useState(false);
     const [shouldInitialize, setShouldInitialize] = React.useState(false);
+    const splineApp = React.useRef<any>(null);
 
     // Initial delay to ensure browser stability before loading Spline
     React.useEffect(() => {
         const timer = setTimeout(() => setShouldInitialize(true), 500);
         return () => clearTimeout(timer);
+    }, []);
+
+    // Explicit Spline cleanup
+    React.useEffect(() => {
+        return () => {
+            if (splineApp.current) {
+                try {
+                    splineApp.current.dispose();
+                } catch (e) {
+                    console.error("Error disposing Spline:", e);
+                }
+            }
+        };
     }, []);
 
     const FallbackUI = (
@@ -83,7 +98,10 @@ export default function SplineScene({ scene }: { scene: string }) {
                 {shouldInitialize && (
                     <Spline
                         scene={scene}
-                        onLoad={() => setIsSplineLoaded(true)}
+                        onLoad={(spline: any) => {
+                            splineApp.current = spline;
+                            setIsSplineLoaded(true);
+                        }}
                         onError={() => {
                             console.warn("Spline onError triggered");
                             // getDerivedStateFromError will handle the state change if it throws
