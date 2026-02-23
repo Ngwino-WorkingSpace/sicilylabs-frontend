@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthProvider';
 import {
     modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
     sectionTitleStyle, fieldGroupStyle, fieldStyle, labelStyle, inputStyle,
-    textareaStyle, errorStyle, modalFooterStyle,
+    textareaStyle, modalFooterStyle,
     cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface Milestone {
     id: string;
@@ -31,7 +32,6 @@ export default function MilestonesAdmin() {
     const [editing, setEditing] = useState<Milestone | null>(null);
     const [form, setForm] = useState(emptyForm);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
 
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
@@ -46,30 +46,48 @@ export default function MilestonesAdmin() {
 
     useEffect(() => { if (token) fetchData(); }, [token]);
 
-    const openCreate = () => { setEditing(null); setForm(emptyForm); setError(''); setShowForm(true); };
+    const openCreate = () => { setEditing(null); setForm(emptyForm); setShowForm(true); };
 
     const openEdit = (m: Milestone) => {
         setEditing(m);
         setForm({ label: m.label || '', number: m.number || '', year: m.year || '', title: m.title || '', company: m.company || '', description: m.description || '', cx: String(m.cx || ''), cy: String(m.cy || '') });
-        setError(''); setShowForm(true);
+        setShowForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); setSaving(true); setError('');
+        e.preventDefault(); setSaving(true);
         try {
             const payload = { ...form, cx: form.cx ? Number(form.cx) : undefined, cy: form.cy ? Number(form.cy) : undefined };
             const url = editing ? `/api/milestones/${editing.id}` : '/api/milestones';
             const res = await fetch(url, { method: editing ? 'PUT' : 'POST', headers, body: JSON.stringify(payload) });
-            if (res.ok) { setShowForm(false); fetchData(); }
-            else { const d = await res.json(); setError(d.message || 'Failed'); }
-        } catch { setError('Network error'); }
+            if (res.ok) {
+                setShowForm(false);
+                fetchData();
+                toast.success(editing ? 'Milestone updated' : 'Milestone created');
+            }
+            else {
+                const d = await res.json();
+                toast.error(d.message || 'Failed');
+            }
+        } catch {
+            toast.error('Network error');
+        }
         setSaving(false);
     };
 
     const handleDelete = async (m: Milestone) => {
         if (!confirm(`Delete "${m.title}"?`)) return;
-        await fetch(`/api/milestones/${m.id}`, { method: 'DELETE', headers });
-        fetchData();
+        try {
+            const res = await fetch(`/api/milestones/${m.id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                toast.success('Milestone deleted');
+                fetchData();
+            } else {
+                toast.error('Failed to delete milestone');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     return (
@@ -95,7 +113,6 @@ export default function MilestonesAdmin() {
                             </div>
 
                             <div style={modalBodyStyle}>
-                                {error && <div style={errorStyle}>{error}</div>}
 
                                 <form onSubmit={handleSubmit}>
                                     {/* Section: Milestone Info */}
