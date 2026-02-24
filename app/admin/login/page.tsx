@@ -4,6 +4,7 @@ import React, { useState, useEffect, Component, ErrorInfo, ReactNode } from 'rea
 import { useAuth } from '../context/AuthProvider';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), { ssr: false });
 
@@ -25,7 +26,6 @@ class SplineErrorBoundary extends Component<
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
     const { login, isAuthenticated } = useAuth();
@@ -39,11 +39,13 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
         const result = await login(email, password);
-        if (result.success) { router.push('/admin'); }
-        else { setError(result.message || 'Login failed'); }
+        if (result.success) {
+            toast.success('Welcome back!');
+            router.push('/admin');
+        }
+        else { toast.error(result.message || 'Login failed'); }
         setLoading(false);
     };
 
@@ -188,23 +190,6 @@ export default function LoginPage() {
                                 margin: 0,
                             }}>Please enter your details.</p>
                         </div>
-
-                        {/* Error */}
-                        {error && (
-                            <div style={{
-                                padding: '12px 16px',
-                                background: '#fef2f2',
-                                border: '1px solid #fecaca',
-                                borderRadius: '10px',
-                                marginBottom: '18px',
-                                fontSize: '13px',
-                                color: '#991b1b',
-                                fontWeight: 600,
-                                animation: 'fadeUp 0.3s ease-out',
-                            }}>
-                                {error}
-                            </div>
-                        )}
 
                         <form onSubmit={handleSubmit}>
                             <div style={{ marginBottom: '16px' }}>
