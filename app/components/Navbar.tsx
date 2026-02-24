@@ -95,11 +95,11 @@ export default function Navbar() {
                         { label: '3D Modeling', href: '/services/3d-modeling' },
                     ]} />
                     <NavLink label="Blog" href="/blog" />
-                    <NavLink label="Our Team" href="#" dropdown={[
-                        { label: 'Project Managers', href: '#' },
-                        { label: 'Designers', href: '#' },
-                        { label: 'Engineers', href: '#' },
-                        { label: 'QA Leads', href: '#' },
+                    <NavLink label="Our Team" href="/team" dropdown={[
+                        { label: 'Project Managers', href: '/team#project-managers' },
+                        { label: 'Designers', href: '/team#designers' },
+                        { label: 'Engineers', href: '/team#engineers' },
+                        { label: 'QA Leads', href: '/team#qa-leads' },
                     ]} />
                     <NavLink label="Contact Us" href="/contact" />
                 </div>
