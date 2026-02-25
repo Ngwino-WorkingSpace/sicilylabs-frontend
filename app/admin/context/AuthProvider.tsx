@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useRouter } from 'next/navigation';
 
 interface User {
-    _id: string;
+    id: string;
     name: string;
     email: string;
     role: string;
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const HARDCODED_ADMIN = {
     email: 'admin@admin.rw',
     password: 'admin',
-    user: { _id: 'admin-local', name: 'Admin', email: 'admin@admin.rw', role: 'admin' },
+    user: { id: 'admin-local', name: 'Admin', email: 'admin@admin.rw', role: 'admin' },
     token: 'hardcoded-testing-token',
 };
 
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (res.ok && data.token) {
                 localStorage.setItem('sl_token', data.token);
                 setToken(data.token);
-                setUser({ _id: data._id, name: data.name, email: data.email, role: data.role });
+                setUser({ id: data._id || data.id, name: data.name, email: data.email, role: data.role });
                 return { success: true };
             } else {
                 return { success: false, message: data.message || 'Invalid credentials' };
