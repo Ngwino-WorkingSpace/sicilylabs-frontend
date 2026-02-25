@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthProvider';
 import {
-    modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
+    modalOverlayStyle, modalBoxStyle,
     modalFooterStyle, cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface Contact {
     id: string;
@@ -42,16 +43,25 @@ export default function InboxAdmin() {
             // Update local state
             setContacts(prev => prev.map(x => x.id === c.id ? { ...x, isRead: true } : x));
             if (selected?.id === c.id) setSelected({ ...selected, isRead: true });
-        } catch { /* ignore */ }
+        } catch {
+            toast.error('Failed to mark as read');
+        }
     };
 
     const handleDelete = async (c: Contact) => {
         if (!confirm(`Delete message from "${c.name}"?`)) return;
         try {
-            await fetch(`/api/contacts/${c.id}`, { method: 'DELETE', headers });
-            setContacts(prev => prev.filter(x => x.id !== c.id));
-            if (selected?.id === c.id) setSelected(null);
-        } catch { /* ignore */ }
+            const res = await fetch(`/api/contacts/${c.id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                setContacts(prev => prev.filter(x => x.id !== c.id));
+                if (selected?.id === c.id) setSelected(null);
+                toast.success('Message deleted');
+            } else {
+                toast.error('Failed to delete message');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     const openMessage = (c: Contact) => {
