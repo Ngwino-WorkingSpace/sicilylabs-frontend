@@ -21,13 +21,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ── Hardcoded admin for testing (remove after backend integration) ──
-const HARDCODED_ADMIN = {
-    email: 'admin@admin.rw',
-    password: 'admin',
-    user: { id: 'admin-local', name: 'Admin', email: 'admin@admin.rw', role: 'admin' },
-    token: 'hardcoded-testing-token',
-};
+
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -36,13 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
     const validateToken = useCallback(async (storedToken: string) => {
-        // Hardcoded token — skip server validation
-        if (storedToken === HARDCODED_ADMIN.token) {
-            setUser(HARDCODED_ADMIN.user);
-            setToken(storedToken);
-            setIsLoading(false);
-            return;
-        }
 
         try {
             const res = await fetch('/api/auth/me', {
@@ -76,13 +63,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [validateToken]);
 
     const login = async (email: string, password: string) => {
-        // ── Hardcoded login for testing ──
-        if (email === HARDCODED_ADMIN.email && password === HARDCODED_ADMIN.password) {
-            localStorage.setItem('sl_token', HARDCODED_ADMIN.token);
-            setToken(HARDCODED_ADMIN.token);
-            setUser(HARDCODED_ADMIN.user);
-            return { success: true };
-        }
 
         // ── Real backend login ──
         try {
