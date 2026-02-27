@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthProvider';
 import {
     modalOverlayStyle, modalBoxStyle, modalHeaderStyle, modalBodyStyle,
     sectionTitleStyle, fieldGroupStyle, fieldStyle, labelStyle, inputStyle,
-    textareaStyle, fileInputWrapperStyle, errorStyle, modalFooterStyle,
+    textareaStyle, fileInputWrapperStyle, modalFooterStyle,
     cancelBtnStyle, submitBtnStyle, closeBtnStyle, modalCSS,
 } from '../components/ModalStyles';
+import { toast } from 'react-toastify';
 
 interface Blog {
     id: string;
@@ -32,7 +33,6 @@ export default function BlogsAdmin() {
     const [form, setForm] = useState(emptyBlog);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
 
     const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -51,7 +51,6 @@ export default function BlogsAdmin() {
         setEditing(null);
         setForm(emptyBlog);
         setImageFile(null);
-        setError('');
         setShowForm(true);
     };
 
@@ -68,14 +67,12 @@ export default function BlogsAdmin() {
             image: blog.image || '',
         });
         setImageFile(null);
-        setError('');
         setShowForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setError('');
         try {
             const formData = new FormData();
             formData.append('title', form.title);
@@ -99,12 +96,13 @@ export default function BlogsAdmin() {
             if (res.ok) {
                 setShowForm(false);
                 fetchBlogs();
+                toast.success(editing ? 'Blog post updated' : 'Blog post published');
             } else {
                 const data = await res.json();
-                setError(data.message || 'Failed to save');
+                toast.error(data.message || 'Failed to save');
             }
         } catch {
-            setError('Network error');
+            toast.error('Network error');
         }
         setSaving(false);
     };
@@ -112,9 +110,16 @@ export default function BlogsAdmin() {
     const handleDelete = async (blog: Blog) => {
         if (!confirm(`Delete "${blog.title}"?`)) return;
         try {
-            await fetch(`/api/blogs/${blog.id}`, { method: 'DELETE', headers });
-            fetchBlogs();
-        } catch { /* ignore */ }
+            const res = await fetch(`/api/blogs/${blog.id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                toast.success('Blog post deleted');
+                fetchBlogs();
+            } else {
+                toast.error('Failed to delete blog post');
+            }
+        } catch {
+            toast.error('Network error');
+        }
     };
 
     return (
@@ -143,7 +148,6 @@ export default function BlogsAdmin() {
 
                             {/* Body */}
                             <div style={modalBodyStyle}>
-                                {error && <div style={errorStyle}>{error}</div>}
 
                                 <form onSubmit={handleSubmit}>
                                     {/* Section: Post Details */}
