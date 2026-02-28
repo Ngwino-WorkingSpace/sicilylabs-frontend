@@ -96,7 +96,7 @@ export default function BlogPostDetail() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-lg md:text-xl font-medium text-zinc-500 leading-relaxed max-w-2xl mx-auto mb-10"
+                    className="text-lg md:text-xl font-medium text-zinc-500 leading-relaxed max-w-2xl mx-auto mb-10 break-words w-full"
                 >
                     {post.excerpt}
                 </motion.p>
@@ -117,8 +117,8 @@ export default function BlogPostDetail() {
                 </motion.div>
             </section>
 
-            {/* Image Section (if available) - Currently using background color as placeholder if no image */}
-            {post.image ? (
+            {/* Image Section (if available) */}
+            {post.image && (
                 <section className="px-8 max-w-5xl mx-auto w-full mb-16">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.98 }}
@@ -134,28 +134,17 @@ export default function BlogPostDetail() {
                         />
                     </motion.div>
                 </section>
-            ) : (
-                <section className="px-8 max-w-5xl mx-auto w-full mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.7, delay: 0.4 }}
-                        className="w-full aspect-[21/9] relative rounded-3xl overflow-hidden bg-zinc-50 border border-zinc-100 flex items-center justify-center"
-                    >
-                        <Image src="/logo.png" alt="SicilyLabs" width={80} height={80} className="opacity-10" />
-                    </motion.div>
-                </section>
             )}
 
             {/* Content Section */}
-            <section className="px-8 max-w-3xl mx-auto w-full mb-24">
+            <section className="px-8 max-w-3xl mx-auto w-full mb-24 overflow-hidden">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
                 >
                     <div
-                        className="prose prose-zinc prose-lg mx-auto prose-p:text-zinc-600 prose-headings:text-black prose-a:text-black hover:prose-a:text-zinc-500 whitespace-pre-wrap leading-relaxed marker:text-black"
+                        className="prose prose-zinc prose-lg mx-auto w-full max-w-none break-words prose-p:text-zinc-600 prose-headings:text-black prose-a:text-black hover:prose-a:text-zinc-500 whitespace-pre-wrap leading-relaxed marker:text-black"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
                 </motion.div>
