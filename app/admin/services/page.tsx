@@ -236,14 +236,14 @@ export default function ServicesAdmin() {
                         }}>
                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#000' }} />
                             <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(0,0,0,0.2)' }}>{s.number || '—'}</span>
-                            <h3 style={{ fontSize: '15px', fontWeight: 900, margin: '4px 0 4px', letterSpacing: '-0.02em' }}>{s.title}</h3>
+                            <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#000', margin: '4px 0 4px', letterSpacing: '-0.02em' }}>{s.title}</h3>
                             {s.tagline && <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.3)', fontStyle: 'italic', marginBottom: '6px' }}>{s.tagline}</p>}
                             <p style={{ fontSize: '12px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.5, marginBottom: '8px' }}>{s.description}</p>
                             {s.steps && s.steps.length > 0 && (
                                 <p style={{ fontSize: '10px', color: 'rgba(0,0,0,0.3)', marginBottom: '12px' }}>{s.steps.length} process steps</p>
                             )}
                             <div style={{ display: 'flex', gap: '6px' }}>
-                                <button onClick={() => openEdit(s)} style={{ padding: '6px 14px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                                <button onClick={() => openEdit(s)} style={{ padding: '6px 14px', background: '#f5f5f5', color: '#000', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                                 <button onClick={() => handleDelete(s)} style={{ padding: '6px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
                             </div>
                         </div>

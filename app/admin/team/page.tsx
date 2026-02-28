@@ -277,12 +277,12 @@ export default function TeamAdmin() {
                                                     {m.imageUrl ? <img src={m.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : m.name.charAt(0).toUpperCase()}
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600 }}>{m.name}</td>
+                                            <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600, color: '#000' }}>{m.name}</td>
                                             <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{m.role}</td>
                                             <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{m.category || '—'}</td>
                                             <td style={{ padding: '12px 16px' }}>
                                                 <div style={{ display: 'flex', gap: '6px' }}>
-                                                    <button onClick={() => openEdit(m)} style={{ padding: '6px 14px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                                                    <button onClick={() => openEdit(m)} style={{ padding: '6px 14px', background: '#f5f5f5', color: '#000', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                                                     <button onClick={() => handleDelete(m)} style={{ padding: '6px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
                                                 </div>
                                             </td>

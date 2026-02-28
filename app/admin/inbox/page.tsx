@@ -157,7 +157,7 @@ export default function InboxAdmin() {
                             }}>{c.name.charAt(0).toUpperCase()}</div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                                    <span style={{ fontSize: '13px', fontWeight: c.isRead ? 600 : 800 }}>{c.name}</span>
+                                    <span style={{ fontSize: '13px', color: '#000', fontWeight: c.isRead ? 600 : 800 }}>{c.name}</span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         {!c.isRead && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#000' }} />}
                                         <span style={{ fontSize: '10px', color: 'rgba(0,0,0,0.3)' }}>{formatDate(c.createdAt)}</span>

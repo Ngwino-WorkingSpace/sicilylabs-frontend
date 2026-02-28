@@ -237,13 +237,13 @@ export default function BlogsAdmin() {
                                 <tr><td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: 'rgba(0,0,0,0.3)', fontSize: '13px' }}>No blog posts yet. Create your first one!</td></tr>
                             ) : blogs.map(blog => (
                                 <tr key={blog.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
-                                    <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600 }}>{blog.title}</td>
+                                    <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600, color: '#000' }}>{blog.title}</td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{blog.category || '—'}</td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{blog.date || '—'}</td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{blog.readTime || '—'}</td>
                                     <td style={{ padding: '12px 16px' }}>
                                         <div style={{ display: 'flex', gap: '6px' }}>
-                                            <button onClick={() => openEdit(blog)} style={{ padding: '6px 14px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                                            <button onClick={() => openEdit(blog)} style={{ padding: '6px 14px', background: '#f5f5f5', color: '#000', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                                             <button onClick={() => handleDelete(blog)} style={{ padding: '6px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
                                         </div>
                                     </td>

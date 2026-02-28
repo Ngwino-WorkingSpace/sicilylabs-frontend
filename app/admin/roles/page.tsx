@@ -132,9 +132,9 @@ export default function RolesAdmin() {
                             position: 'relative', overflow: 'hidden',
                         }}>
                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#000' }} />
-                            <h3 style={{ fontSize: '15px', fontWeight: 900, margin: '4px 0 12px', letterSpacing: '-0.02em' }}>{r.name}</h3>
+                            <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#000', margin: '4px 0 12px', letterSpacing: '-0.02em' }}>{r.name}</h3>
                             <div style={{ display: 'flex', gap: '6px' }}>
-                                <button onClick={() => openEdit(r)} style={{ padding: '6px 14px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                                <button onClick={() => openEdit(r)} style={{ padding: '6px 14px', background: '#f5f5f5', color: '#000', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                                 <button onClick={() => handleDelete(r)} style={{ padding: '6px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
                             </div>
                         </div>

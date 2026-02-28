@@ -27,15 +27,18 @@ export default function BlogPostDetail() {
 
     useEffect(() => {
         if (!slug) return;
-        fetch('/api/blogs')
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    const found = data.find((b: BlogPost) => b.slug === slug);
-                    setPost(found || null);
-                }
+        fetch(`/api/blogs/${slug}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Not found');
+                return res.json();
             })
-            .catch(err => console.error(err))
+            .then(data => {
+                setPost(data);
+            })
+            .catch(err => {
+                console.error(err);
+                setPost(null);
+            })
             .finally(() => setLoading(false));
     }, [slug]);
 
@@ -150,10 +153,9 @@ export default function BlogPostDetail() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
-                    className="prose prose-zinc prose-lg mx-auto"
                 >
                     <div
-                        className="whitespace-pre-wrap text-[15px] md:text-[17px] leading-relaxed text-zinc-700 font-medium"
+                        className="prose prose-zinc prose-lg mx-auto prose-p:text-zinc-600 prose-headings:text-black prose-a:text-black hover:prose-a:text-zinc-500 whitespace-pre-wrap leading-relaxed marker:text-black"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
                 </motion.div>

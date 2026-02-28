@@ -254,12 +254,12 @@ export default function ProjectsAdmin() {
                             ) : projects.map(p => (
                                 <tr key={p.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', fontWeight: 800, color: 'rgba(0,0,0,0.3)' }}>{p.projectId || '—'}</td>
-                                    <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600 }}>{p.title}</td>
+                                    <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 600, color: '#000' }}>{p.title}</td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{p.category || '—'}</td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(0,0,0,0.5)' }}>{p.tag || '—'}</td>
                                     <td style={{ padding: '12px 16px' }}>
                                         <div style={{ display: 'flex', gap: '6px' }}>
-                                            <button onClick={() => openEdit(p)} style={{ padding: '6px 14px', background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                                            <button onClick={() => openEdit(p)} style={{ padding: '6px 14px', background: '#f5f5f5', color: '#000', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                                             <button onClick={() => handleDelete(p)} style={{ padding: '6px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#991b1b' }}>Delete</button>
                                         </div>
                                     </td>
