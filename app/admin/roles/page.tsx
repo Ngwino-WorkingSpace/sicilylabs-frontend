@@ -28,7 +28,9 @@ export default function RolesAdmin() {
 
     const fetchRoles = async () => {
         try {
-            const res = await fetch('/api/roles');
+            const res = await fetch('/api/roles', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setRoles(Array.isArray(data) ? data : []);
         } catch { /* ignore */ }

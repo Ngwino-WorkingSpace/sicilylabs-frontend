@@ -38,7 +38,9 @@ export default function BlogsAdmin() {
 
     const fetchBlogs = async () => {
         try {
-            const res = await fetch('/api/blogs');
+            const res = await fetch('/api/blogs', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setBlogs(Array.isArray(data) ? data : []);
         } catch { /* ignore */ }

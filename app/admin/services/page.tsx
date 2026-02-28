@@ -45,7 +45,9 @@ export default function ServicesAdmin() {
 
     const fetchServices = async () => {
         try {
-            const res = await fetch('/api/services');
+            const res = await fetch('/api/services', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setServices(Array.isArray(data) ? data : []);
         } catch { /* ignore */ }

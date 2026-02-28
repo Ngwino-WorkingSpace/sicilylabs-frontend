@@ -41,7 +41,9 @@ export default function TeamAdmin() {
 
     const fetchTeam = async () => {
         try {
-            const res = await fetch('/api/team');
+            const res = await fetch('/api/team', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setMembers(Array.isArray(data) ? data : []);
         } catch { /* */ }
@@ -50,7 +52,9 @@ export default function TeamAdmin() {
 
     const fetchRoles = async () => {
         try {
-            const res = await fetch('/api/roles');
+            const res = await fetch('/api/roles', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setRoles(Array.isArray(data) ? data : []);
         } catch { /* */ }

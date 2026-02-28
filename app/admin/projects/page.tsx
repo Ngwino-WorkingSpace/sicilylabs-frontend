@@ -41,7 +41,9 @@ export default function ProjectsAdmin() {
 
     const fetchProjects = async () => {
         try {
-            const res = await fetch('/api/projects');
+            const res = await fetch('/api/projects', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setProjects(Array.isArray(data) ? data : []);
         } catch { /* ignore */ }
