@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
 
 // Dynamic import for SplineScene to prevent SSR/Hydration errors
 const SplineScene = dynamic(() => import('../components/SplineScene'), {
@@ -15,6 +16,59 @@ const SplineScene = dynamic(() => import('../components/SplineScene'), {
 });
 
 export default function ContactPage() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+    });
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!formData.name || !formData.email || !formData.message) {
+            toast.error('Please fill in name, email, and message fields.');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const finalMessage = formData.subject
+                ? `[Subject: ${formData.subject}]\n\n${formData.message}`
+                : formData.message;
+
+            const res = await fetch('/api/contacts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    message: finalMessage
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                toast.success('Message sent successfully!');
+                setFormData({ name: '', email: '', subject: '', message: '' });
+            } else {
+                toast.error(data.message || 'Failed to send message.');
+            }
+        } catch (error) {
+            toast.error('A network error occurred. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <main className="min-h-screen bg-white relative overflow-hidden font-sans pt-20 selection:bg-black selection:text-white">
@@ -52,10 +106,13 @@ export default function ContactPage() {
                             Let's <span className="text-zinc-200">Start</span> <br /> Something.
                         </h1>
 
-                        <form className="space-y-8 max-w-md">
+                        <form className="space-y-8 max-w-md" onSubmit={handleSubmit}>
                             <div className="relative group">
                                 <input
                                     type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
                                     placeholder="NAME"
                                     className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-black transition-colors placeholder:text-black/20"
                                 />
@@ -64,6 +121,9 @@ export default function ContactPage() {
                             <div className="relative group">
                                 <input
                                     type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     placeholder="EMAIL ADDRESS"
                                     className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-black transition-colors placeholder:text-black/20"
                                 />
@@ -72,6 +132,9 @@ export default function ContactPage() {
                             <div className="relative group">
                                 <input
                                     type="text"
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleChange}
                                     placeholder="SUBJECT"
                                     className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-black transition-colors placeholder:text-black/20"
                                 />
@@ -79,6 +142,9 @@ export default function ContactPage() {
 
                             <div className="relative group">
                                 <textarea
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
                                     placeholder="MESSAGE"
                                     rows={4}
                                     className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-black transition-colors placeholder:text-black/20 resize-none"
@@ -86,11 +152,13 @@ export default function ContactPage() {
                             </div>
 
                             <motion.button
+                                type="submit"
+                                disabled={loading}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="w-full bg-black text-white py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-zinc-800 transition-colors shadow-2xl"
+                                className="w-full bg-black text-white py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-zinc-800 transition-colors shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Send Message
+                                {loading ? 'Sending...' : 'Send Message'}
                             </motion.button>
                         </form>
 
