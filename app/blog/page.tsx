@@ -66,19 +66,8 @@ export default function BlogPage() {
         <main className="min-h-screen bg-[#f9f9f9] font-sans flex flex-col">
             <Navbar />
 
-            {/* Top search bar */}
-            <div className="pt-28 px-8 max-w-6xl mx-auto w-full flex justify-between items-center">
-                <div className="flex items-center gap-3 bg-white border border-zinc-100 rounded-xl px-4 py-2.5 shadow-sm w-64">
-                    <svg className="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-                    </svg>
-                    <input
-                        type="text"
-                        placeholder="Search story, author, topic..."
-                        className="bg-transparent text-[11px] font-medium text-zinc-600 placeholder:text-zinc-300 outline-none w-full"
-                    />
-                </div>
-
+            {/* Top right profile / logo */}
+            <div className="pt-28 px-8 max-w-6xl mx-auto w-full flex justify-end items-center">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-black flex items-center justify-center">
                         <Image src="/logo.png" alt="SicilyLabs" width={32} height={32} className="w-full h-full object-cover" />
